@@ -20,18 +20,18 @@ const WEST = 3;
 
 async function Maze() {
 
-    var sleepTime = 500;
-    var numCells = 9;
-    var numRows = Math.sqrt(numCells);
-    var numColumns = Math.sqrt(numCells);
+    let sleepTime = 500;
+    let numCells = 9;
+    let numRows = Math.sqrt(numCells);
+    let numColumns = Math.sqrt(numCells);
 
-    var visited = [];
-    var frontier = [];
-    var cells = [];
+    let visited = [];
+    let frontier = [];
+    let cells = [];
 
-    var gridContainer = document.getElementById("grid-container");
+    let gridContainer = document.getElementById("grid-container");
 
-    var drop = document.getElementById("grid-drop");
+    let drop = document.getElementById("grid-drop");
     drop.addEventListener("change", GenerateGrid);
 
     document.getElementById("reset-btn").addEventListener("click", GenerateGrid);
@@ -71,6 +71,11 @@ async function Maze() {
      *
      */
     async function GenerateMaze() {
+        document.getElementById("run-btn").disabled = true;
+        document.getElementById("run-btn").style.backgroundColor = "rgb(125, 125, 125)";
+        document.getElementById("reset-btn").disabled = true;
+        document.getElementById("reset-btn").style.backgroundColor = "rgb(125, 125, 125)";
+        drop.disabled = true;
 
         visited = Array(numCells).fill(false);
 
@@ -85,7 +90,7 @@ async function Maze() {
         let neighbors = Neighbors(startRow, startColumn);
         let idx = -1;
 
-        for (var neighbor of neighbors) {
+        for (let neighbor of neighbors) {
             idx = FindCellIndex(neighbor, CELLS);
             document.getElementById("grid-item" + idx).style.backgroundColor = "rgb(255, 200, 200)";
             frontier.push(neighbor);
@@ -94,7 +99,13 @@ async function Maze() {
         document.getElementById("grid-item" + FindCellIndex([startRow, startColumn], CELLS)).style.backgroundColor = "rgb(255, 240, 240)";
 
         await sleep(sleepTime);
-        PrimsAlgorithm();
+        await PrimsAlgorithm();
+
+    
+        document.getElementById("reset-btn").disabled = false;
+        document.getElementById("reset-btn").style.backgroundColor = "rgb(0, 0, 0)";
+        drop.disabled = false;
+
     }
 
     /*
@@ -109,18 +120,18 @@ async function Maze() {
             let randomCellIdx = FindCellIndex(randomCell, FRONTIER);
             frontier.splice(randomCellIdx, 1);
 
-            var randCellNeighbors = Neighbors(randomCell[0], randomCell[1]);
-            var randCellVisitedNeighbors = [];
-            for (var neighbor of randCellNeighbors) {
+            let randCellNeighbors = Neighbors(randomCell[0], randomCell[1]);
+            let randCellVisitedNeighbors = [];
+            for (let neighbor of randCellNeighbors) {
                 if (visited[FindCellIndex(neighbor, CELLS)]) randCellVisitedNeighbors.push(neighbor);
             }
 
-            var randomVisitedNeighbor = randCellVisitedNeighbors[Math.floor(Math.random() * randCellVisitedNeighbors.length)]
+            let randomVisitedNeighbor = randCellVisitedNeighbors[Math.floor(Math.random() * randCellVisitedNeighbors.length)]
             CutEdge(randomCell, randomVisitedNeighbor);
             await sleep(sleepTime);
             visited[FindCellIndex(randomCell, CELLS)] = true;
 
-            for (var neighbor of randCellNeighbors) {
+            for (let neighbor of randCellNeighbors) {
                 if (!visited[FindCellIndex(neighbor, CELLS)] && (FindCellIndex(neighbor, FRONTIER)) < 0) {
                     frontier.push(neighbor);
                     document.getElementById("grid-item" + FindCellIndex(neighbor, CELLS)).style.backgroundColor = "rgb(255, 200, 200)";
@@ -139,6 +150,9 @@ async function Maze() {
     */
     function GenerateGrid(numCells) {
         cells = [];
+
+        document.getElementById("run-btn").disabled = false;
+        document.getElementById("run-btn").style.backgroundColor = "rgb(0, 0, 0)";
     
         while (gridContainer.firstChild) {
             gridContainer.removeChild(gridContainer.lastChild);
